@@ -1,0 +1,35 @@
+﻿  TemplateSimulator.cpp
+d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\vectorbase.h(11): warning C4005: "NOMINMAX": Makro-Neudefinition
+  d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\templatesimulator.cpp: note: Siehe vorherige Definition von "NOMINMAX"
+d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\vectorbase.h(204): warning C4244: "Argument": Konvertierung von "const Scalar" in "float", möglicher Datenverlust
+          with
+          [
+              Scalar=GamePhysics::Real
+          ]
+  d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\vectorbase.h(203): note: Bei der Kompilierung von Klasse Vorlage der DirectX::XMVECTOR GamePhysics::vector3Dim<GamePhysics::Real>::toDirectXVector(void) const-Memberfunktion
+  d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\drawingutilitiesclass.h(285): note: Siehe Verweis auf die Instanziierung der gerade kompilierten Funktions-Vorlage "DirectX::XMVECTOR GamePhysics::vector3Dim<GamePhysics::Real>::toDirectXVector(void) const".
+  d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\vectorbase.h(859): note: Siehe Verweis auf die Klasse Vorlage-Instanziierung "GamePhysics::vector3Dim<GamePhysics::Real>", die kompiliert wird.
+d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\matrixbase.h(777): warning C4244: "Argument": Konvertierung von "Scalar" in "float", möglicher Datenverlust
+          with
+          [
+              Scalar=double
+          ]
+  d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\matrixbase.h(773): note: Bei der Kompilierung von Klasse Vorlage der DirectX::XMMATRIX GamePhysics::matrix4x4<double>::toDirectXMatrix(void)-Memberfunktion
+  d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\drawingutilitiesclass.h(380): note: Siehe Verweis auf die Instanziierung der gerade kompilierten Funktions-Vorlage "DirectX::XMMATRIX GamePhysics::matrix4x4<double>::toDirectXMatrix(void)".
+  d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\drawingutilitiesclass.h(379): note: Siehe Verweis auf die Klasse Vorlage-Instanziierung "GamePhysics::matrix4x4<double>", die kompiliert wird.
+d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\matrixbase.h(776): warning C4244: "Argument": Konvertierung von "Scalar" in "float", möglicher Datenverlust
+          with
+          [
+              Scalar=double
+          ]
+d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\matrixbase.h(775): warning C4244: "Argument": Konvertierung von "Scalar" in "float", möglicher Datenverlust
+          with
+          [
+              Scalar=double
+          ]
+d:\tum\5. semester\phys\exercises\gamephysicstemplate\simulations\util\matrixbase.h(774): warning C4244: "Argument": Konvertierung von "Scalar" in "float", möglicher Datenverlust
+          with
+          [
+              Scalar=double
+          ]
+  Demo_2017.vcxproj -> D:\TUM\5. Semester\Phys\Exercises\gamephysicstemplate\Win32\Debug\Simulations.lib
