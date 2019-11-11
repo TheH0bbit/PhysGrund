@@ -16,10 +16,12 @@ public:
 	
 	// UI Functions
 	const char * getTestCasesStr();
+	const char * getIntegrationMethod();
 	void initUI(DrawingUtilitiesClass * DUC);
 	void reset();
 	void drawFrame(ID3D11DeviceContext* pd3dImmediateContext);
 	void notifyCaseChanged(int testCase);
+	void notifyMethodChanged(int integrationMethod);
 	void externalForcesCalculations(float timeElapsed);
 	void simulateTimestep(float timeStep);
 	void onClick(int x, int y);
@@ -36,6 +38,15 @@ public:
 	Vec3 getPositionOfMassPoint(int index);
 	Vec3 getVelocityOfMassPoint(int index);
 	void applyExternalForce(Vec3 force);
+	void integrateEuler(float timeStep);
+	void integrateMidpoint(float timeStep);
+	void integrateLeapFrog(float timeStep);
+
+	void setUpDemo1();
+	void setUpDemo2();
+	void setUpDemo3();
+	void setUpDemo4();
+
 	
 	// Do Not Change
 	void setIntegrator(int integrator) {
@@ -47,6 +58,7 @@ private:
 	float m_fMass;
 	float m_fStiffness;
 	float m_fDamping;
+	int m_iTestScene;
 	int m_iIntegrator;
 
 	// UI Attributes

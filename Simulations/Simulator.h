@@ -25,6 +25,8 @@ public:
 	
 	virtual const char * getTestCasesStr() = 0;
 
+	virtual const char * getIntegrationMethod() = 0;
+
 	virtual void reset() = 0;
 	
 	/*
@@ -57,6 +59,15 @@ public:
 	**for more info on how to use this function take a look at the template simulator 
 	*/
 	virtual void notifyCaseChanged(int testCase) = 0;
+
+
+	/*
+	This Function is used to notify the simulator that the integration method is changed 
+	so that the needed changes can be handed here
+	*/
+	virtual void notifyMethodChanged(int integrationMethod) = 0;
+
+	
 
 	/*
 	this function is used to receive the input from the mouse

@@ -20,8 +20,8 @@ using namespace GamePhysics;
 
 //#define ADAPTIVESTEP
 
-#define TEMPLATE_DEMO
-//#define MASS_SPRING_SYSTEM
+//#define TEMPLATE_DEMO
+#define MASS_SPRING_SYSTEM
 //#define RIGID_BODY_SYSTEM
 //#define SPH_SYSTEM
 
@@ -46,7 +46,9 @@ float   g_fTimeFactor = 1;
 #endif
 bool  g_bDraw = true;
 int g_iTestCase = 0;
+int g_iIntegrationMethod = 0;
 int g_iPreTestCase = -1;
+int g_iPreIntegrationMethod = -1;
 bool  g_bSimulateByStep = false;
 bool firstTime = true;
 // Video recorder
@@ -58,6 +60,8 @@ void initTweakBar(){
 	TwDefine(" TweakBar color='0 128 128' alpha=128 ");
 	TwType TW_TYPE_TESTCASE = TwDefineEnumFromString("Test Scene", g_pSimulator->getTestCasesStr());
 	TwAddVarRW(g_pDUC->g_pTweakBar, "Test Scene", TW_TYPE_TESTCASE, &g_iTestCase, "");
+	TwType TW_TYPE_INTEGRATION_METHOD = TwDefineEnumFromString("Integration Method", g_pSimulator->getIntegrationMethod());
+	TwAddVarRW(g_pDUC->g_pTweakBar, "Integration Mode", TW_TYPE_INTEGRATION_METHOD, &g_iIntegrationMethod, "");
 	// HINT: For buttons you can directly pass the callback function as a lambda expression.
 	TwAddButton(g_pDUC->g_pTweakBar, "Reset Scene", [](void * s){ g_iPreTestCase = -1; }, nullptr, "");
 	TwAddButton(g_pDUC->g_pTweakBar, "Reset Camera", [](void * s){g_pDUC->g_camera.Reset();}, nullptr,"");
@@ -249,8 +253,21 @@ void CALLBACK OnFrameMove( double dTime, float fElapsedTime, void* pUserContext 
 		}
 		initTweakBar();
 		g_pSimulator->notifyCaseChanged(g_iTestCase);
+		
 		g_pSimulator->initUI(g_pDUC);
 		g_iPreTestCase = g_iTestCase;
+	}
+	if (g_iPreIntegrationMethod != g_iIntegrationMethod) {// test case changed
+		// clear old setup and build up new setup
+		if (g_pDUC->g_pTweakBar != nullptr) {
+			TwDeleteBar(g_pDUC->g_pTweakBar);
+			g_pDUC->g_pTweakBar = nullptr;
+		}
+		initTweakBar();
+		g_pSimulator->notifyMethodChanged(g_iIntegrationMethod);
+
+		g_pSimulator->initUI(g_pDUC);
+		g_iPreIntegrationMethod = g_iIntegrationMethod;
 	}
 	if(!g_bSimulateByStep){
 #ifdef ADAPTIVESTEP
