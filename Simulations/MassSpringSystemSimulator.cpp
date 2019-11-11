@@ -56,6 +56,26 @@ void MassSpringSystemSimulator::reset() {
 	m_trackmouse.x = m_trackmouse.y = 0;
 	m_oldtrackmouse.x = m_oldtrackmouse.y = 0;
 
+	m_fMass = 10;
+	m_fStiffness = 40;
+	m_fDamping = 0;
+	
+	
+	//masspoints = new Masspoint[100];
+	//springs = new Spring[100];
+
+	for (int i = 0; i < masspointCount; i++) {
+		masspoints[i].isEmpty = true;
+	}
+	for (int i = 0; i < springCount; i++) {
+		springs[i].isEmpty = true;
+	}
+
+
+	masspointCount = 0;
+	springCount = 0;
+	cout << "Reset";
+
 }
 
 void MassSpringSystemSimulator::initUI(DrawingUtilitiesClass * DUC)
@@ -64,6 +84,7 @@ void MassSpringSystemSimulator::initUI(DrawingUtilitiesClass * DUC)
 	switch (m_iTestScene)
 	{
 	case 0:break;
+	;
 	case 1:break;
 	case 2:break;
 	default:break;
@@ -72,13 +93,30 @@ void MassSpringSystemSimulator::initUI(DrawingUtilitiesClass * DUC)
 
 void MassSpringSystemSimulator::externalForcesCalculations(float timeElapsed) {
 	//TODO: copy from SimulatorTemplate and implement for the likes of gravity etc via going through masspoint array and adding external forces onto springForce
-
+	Point2D mouseDiff;
+	mouseDiff.x = m_trackmouse.x - m_oldtrackmouse.x;
+	mouseDiff.y = m_trackmouse.y - m_oldtrackmouse.y;
+	if (mouseDiff.x != 0 || mouseDiff.y != 0)
+	{
+		Mat4 worldViewInv = Mat4(DUC->g_camera.GetWorldMatrix() * DUC->g_camera.GetViewMatrix());
+		worldViewInv = worldViewInv.inverse();
+		Vec3 inputView = Vec3((float)mouseDiff.x, (float)-mouseDiff.y, 0);
+		Vec3 inputWorld = worldViewInv.transformVectorNormal(inputView);
+		// find a proper scale!
+		float inputScale = 0.001f;
+		inputWorld = inputWorld * inputScale;
+		m_externalForce += inputWorld;
+	}
+	else {
+		
+	}
 	return;
 }
 
 void MassSpringSystemSimulator::notifyCaseChanged(int testCase)
 {
 	m_iTestScene = testCase;
+	
 	switch (m_iTestScene)
 	{
 	case 0:
@@ -181,6 +219,7 @@ void MassSpringSystemSimulator::applyExternalForce(Vec3 force) {
 }
 
 void MassSpringSystemSimulator::simulateTimestep(float timeStep) {
+	
 	switch (m_iIntegrator) {
 	case EULER: 
 		
@@ -219,15 +258,21 @@ void MassSpringSystemSimulator::integrateEuler(float timeStep) {
 		masspoints[springs[i].masspoint1].springForce = forceAtoB;
 		masspoints[springs[i].masspoint2].springForce = forceBtoA;
 		
-		std::cout << "Force "<<i<<": "<<forceAtoB.toString()<< ") \n";
-		std::cout << "Force " << i << ": "<<forceBtoA.toString() << ") \n";
+		//std::cout << "Force "<<i<<": "<<forceAtoB.toString()<< ") \n";
+		//std::cout << "Force " << i << ": "<<forceBtoA.toString() << ") \n";
 	}
 	for (int i = 0; i < masspointCount; i++) {
 		if (!masspoints[i].isFixed) {
 			masspoints[i].position = masspoints[i].position + masspoints[i].velocity*timeStep;
+			if (m_iTestScene == 3) {//Collision
+				if (masspoints[i].position.y < -1) {
+					masspoints[i].position.y = -1;
+				}
+			}
+
 			masspoints[i].velocity = masspoints[i].velocity + masspoints[i].springForce / m_fMass * timeStep;
-			std::cout << "Point " << i << " Pos: (" << masspoints[i].position.x << ", " << masspoints[i].position.y << ", " << masspoints[i].position.z << ") \n";
-			std::cout << "Point " << i << " Vel: (" << masspoints[i].velocity.x << ", " << masspoints[i].velocity.y << ", " << masspoints[i].velocity.z << ") \n";
+		//	std::cout << "Point " << i << " Pos: (" << masspoints[i].position.x << ", " << masspoints[i].position.y << ", " << masspoints[i].position.z << ") \n";
+			//std::cout << "Point " << i << " Vel: (" << masspoints[i].velocity.x << ", " << masspoints[i].velocity.y << ", " << masspoints[i].velocity.z << ") \n";
 		}
 		
 	}
@@ -271,6 +316,11 @@ void  MassSpringSystemSimulator::integrateMidpoint(float timeStep) {
 		if (!masspoints[i].isFixed) {
 			masspoints[i].tempVelocity = masspoints[i].velocity + timeStep / 2 * masspoints[i].springForce / m_fMass;
 			masspoints[i].position = masspoints[i].position + timeStep * masspoints[i].tempVelocity;
+			if (m_iTestScene == 3) {//Collision
+				if (masspoints[i].position.y < -1) {
+					masspoints[i].position.y = -1;
+				}
+			}
 		}
 
 	}
@@ -297,6 +347,9 @@ void  MassSpringSystemSimulator::integrateMidpoint(float timeStep) {
 	for (int i = 0; i < masspointCount; i++) {
 		if (!masspoints[i].isFixed) {
 			masspoints[i].velocity = masspoints[i].velocity + timeStep * masspoints[i].springForce / m_fMass;
+
+			//std::cout << "Point " << i << " Pos: (" << masspoints[i].position.x << ", " << masspoints[i].position.y << ", " << masspoints[i].position.z << ") \n";
+			//std::cout << "Point " << i << " Vel: (" << masspoints[i].velocity.x << ", " << masspoints[i].velocity.y << ", " << masspoints[i].velocity.z << ") \n";
 		}
 	}
 
@@ -305,6 +358,8 @@ void  MassSpringSystemSimulator::integrateMidpoint(float timeStep) {
 void  MassSpringSystemSimulator::integrateLeapFrog(float timeStep) {
 
 }
+
+
 
 void MassSpringSystemSimulator::drawFrame(ID3D11DeviceContext* pd3dImmediateContext) {
 	for (int i = 0; i < masspointCount; i++) {
@@ -335,24 +390,92 @@ void MassSpringSystemSimulator::onMouse(int x, int y)
 void MassSpringSystemSimulator::setUpDemo1() {
 	//TODO: Create two points and simulate one step with any integration method, Switching doesnt work yet, simulation freezes
 	//TODO: Print out initial position and end position
-
+	reset();
+	cout << "setup1";
+	m_iIntegrator = 0;
 	addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
 	addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
 	addSpring(0, 1, 1);
+	simulateTimestep(0.1f);
+	std::cout << "EulerSolution:"<< "Point " << 1<< " Pos:" << masspoints[0].position.x << ", " << masspoints[0].position.y << ", " << masspoints[0].position.z << ") \n";
+	std::cout << "Point " << 1 << " Vel: (" << masspoints[0].velocity.x << ", " << masspoints[0].velocity.y << ", " << masspoints[0].velocity.z << ") \n";
+	std::cout << "Point " << 2 << " Pos:" << masspoints[1].position.x << ", " << masspoints[1].position.y << ", " << masspoints[1].position.z << ") \n";
+	std::cout << "Point " << 2 << " Vel: (" << masspoints[1].velocity.x << ", " << masspoints[1].velocity.y << ", " << masspoints[1].velocity.z << ") \n";
+
+	std::cout << "MidpointSolution:" << "Point " << 1 << " Pos:" << masspoints[0].position.x << ", " << masspoints[0].position.y << ", " << masspoints[0].position.z << ") \n";
+	std::cout << "Point " << 1 << " Vel: (" << masspoints[0].velocity.x << ", " << masspoints[0].velocity.y << ", " << masspoints[0].velocity.z << ") \n";
+	std::cout << "Point " << 2 << " Pos:" << masspoints[1].position.x << ", " << masspoints[1].position.y << ", " << masspoints[1].position.z << ") \n";
+	std::cout << "Point " << 2 << " Vel: (" << masspoints[1].velocity.x << ", " << masspoints[1].velocity.y << ", " << masspoints[1].velocity.z << ") \n";
+	
+
+	cout << getNumberOfMassPoints();
+	cout << getNumberOfSprings();
 }
 
 void MassSpringSystemSimulator::setUpDemo2() {
 	//TODO: Set up regular simulation with two points, user can choose which integration method should be used, time step = 0.005
 	//TODO: Pay attention that changing the integration method can or cannot reset the scene (idk what makes more sense)
-	
+	reset();
+	cout << "setup2";
+	//m_iIntegrator = 0;
+	notifyMethodChanged(0);
+	addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
+	addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
+	addSpring(0, 1, 1);
+
+	cout << getNumberOfMassPoints();
+	cout << getNumberOfSprings();
 }
 
 void MassSpringSystemSimulator::setUpDemo3() {
 	//TODO: Set up 10 Point, 10 SPring simulation, use can freely choose which integration method should be used
 	//TODO: Let user choose time step freely
 	//TODO: implement gravity, collision detection
+	reset();
+	cout << "setup3";
+	//m_iIntegrator = 2;
+	notifyMethodChanged(1);
+	addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
+	addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
+	addSpring(0, 1, 1);
+	
+	cout << getNumberOfMassPoints();
+	cout << getNumberOfSprings();
 }
 
 void MassSpringSystemSimulator::setUpDemo4() {
+	
+	reset();
+	cout << "setup4";
+	//m_iIntegrator = 0;
+	notifyMethodChanged(0);
+	applyExternalForce(Vec3(0, -9.81f, 0)); //adding gravity
+	
+
+	addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 1), false);
+	addMassPoint(Vec3(0, 2, 0), Vec3(1, 2, 0), false);
+	addMassPoint(Vec3(1, 0, 0), Vec3(-1, 0, -1), false);
+	addMassPoint(Vec3(0, 2, 1), Vec3(1, -2, 0), false);
+	addMassPoint(Vec3(2, 0, 0), Vec3(-1, 0, 3), false);
+	addMassPoint(Vec3(0, 2, 2), Vec3(1, 4, 0), false);
+	addMassPoint(Vec3(3, 0, 0), Vec3(-1, 0, -3), false);
+	addMassPoint(Vec3(0, 2, 3), Vec3(1, -4, 0), false);
+	addMassPoint(Vec3(4, 0, 0), Vec3(-1, 0, 5), false);
+	addMassPoint(Vec3(0, 2, 4), Vec3(1, 6, 0), false);
+
+
+	addSpring(0, 1, 1);
+	addSpring(2, 3, 1);
+	addSpring(4, 5, 1);
+	addSpring(6, 7, 1);
+	addSpring(8, 9, 1);
+	addSpring(10, 1, 1);
+	addSpring(3, 5, 1);
+	addSpring(2, 7, 1);
+	addSpring(9, 4, 1);
+	addSpring(8, 6, 1);
+
+	cout << getNumberOfMassPoints();
+	cout << getNumberOfSprings();
 
 }

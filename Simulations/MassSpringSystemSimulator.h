@@ -2,10 +2,12 @@
 #define MASSSPRINGSYSTEMSIMULATOR_h
 #include "Simulator.h"
 
+
 // Do Not Change
 #define EULER 0
-#define LEAPFROG 1
-#define MIDPOINT 2
+
+#define MIDPOINT 1
+#define LEAPFROG 2
 // Do Not Change
 
 
