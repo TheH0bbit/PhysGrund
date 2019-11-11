@@ -24,6 +24,7 @@ public:
 	void simulateTimestep(float timeStep);
 	void onClick(int x, int y);
 	void onMouse(int x, int y);
+	void drawSpheresLines();
 
 	// Specific Functions
 	void setMass(float mass);
@@ -36,11 +37,33 @@ public:
 	Vec3 getPositionOfMassPoint(int index);
 	Vec3 getVelocityOfMassPoint(int index);
 	void applyExternalForce(Vec3 force);
+	void integrateEuler(float timestep);
+	void integrateMidpoint(float timestep);
+	void initSystem(int mp, int springs);
+
 	
 	// Do Not Change
 	void setIntegrator(int integrator) {
 		m_iIntegrator = integrator;
 	}
+
+	class massPoint {
+	public:
+		Vec3 position;
+		Vec3 newPosition;
+		Vec3 velocity;
+		Vec3 newVelocity;
+		bool isFixed;
+		bool isOpen;
+	};
+
+	class spring {
+	public:
+		int p1;
+		int p2;
+		float length;
+		bool isOpen;
+	};
 
 private:
 	// Data Attributes
@@ -48,11 +71,16 @@ private:
 	float m_fStiffness;
 	float m_fDamping;
 	int m_iIntegrator;
+	bool debug;
+
+	std::vector<massPoint> massPoints;
+	std::vector<spring> springs;
 
 	// UI Attributes
 	Vec3 m_externalForce;
 	Point2D m_mouse;
 	Point2D m_trackmouse;
 	Point2D m_oldtrackmouse;
+
 };
 #endif
